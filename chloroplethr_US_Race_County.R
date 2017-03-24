@@ -2,7 +2,9 @@
 library(choroplethr)
 library(acs)
 library(ggplot2)
+library(RColorBrewer)
 setwd("C:/Github/DataBlog")
+col.pal<-brewer.pal(7,"Greens")
 
 ###### API key
 # Need to go to http://api.census.gov/data/key_signup.html to set API key
@@ -29,6 +31,19 @@ county_choropleth_acs(tableId="B02009")+labs(title="US Population by County (201
 county_choropleth_acs(tableId="B02011")+labs(title="US Population by County (2011) - Asian")
 county_choropleth_acs(tableId="B03001")+labs(title="US Population by County (2011) - Hispanic")
 
+# Changing colors, easy but doesn't work for Alaska)
+county_choropleth_acs(tableId="B19301") +
+  scale_fill_brewer(palette=3) 
+
+# Changing colors, harder and works for all states
+choro1<-CountyChoropleth$new(df_2015$df)
+choro1$title = "2015 Per Capita Income"
+choro1$ggplot_scale = scale_fill_manual(name="Per Capita Income",values=c("blue", "red","orange","green","black","purple","yellow"), drop=FALSE)
+choro1$render()
+
+choro1$ggplot_scale = scale_fill_manual(name="Per Capita Income",values=col.pal, drop=FALSE)
+choro1$render()
+
 ###### Animated Choropleth
 df_2015<-get_acs_data(tableId="B19301",map="county",endyear=2015)
 df_2014<-get_acs_data(tableId="B19301",map="county",endyear=2014)
@@ -47,14 +62,48 @@ choro_list[[6]]<-county_choropleth(df_2015$df)
 
 choroplethr_animate(choro_list)
 
-# Changing colors
-county_choropleth_acs(tableId="B19301") +
-  scale_fill_brewer(palette=3)
 # Number of bins
 county_choropleth_acs(tableId="B19301",num_colors=4) 
 county_choropleth_acs(tableId="B19301",num_colors=1)  # continuous
 
-###### Set fixed bounds so this makes more sense
+###### Set fixed break points
+df_2010$df$breaks<-""
+for (i in 1:nrow(df_2010$df))
+{
+  if (is.na(df_2010$df[i,"value"])) 
+    {
+    df_2010$df[i,"breaks"] <- "$20-$30K"
+  } else if (df_2010$df[i,"value"] < 10000) {
+    df_2010$df[i,"breaks"] <- "$0-$10K"
+  } else if (df_2010$df[i,"value"]>=10000 & df_2010$df[i,"value"]<20000) {
+    df_2010$df[i,"breaks"] <- "$10-$20K"
+  } else if (df_2010$df[i,"value"]>=20000 & df_2010$df[i,"value"]<30000) {
+    df_2010$df[i,"breaks"] <- "$20-$30K"
+  } else if (df_2010$df[i,"value"]>=30000 & df_2010$df[i,"value"]<40000) {
+    df_2010$df[i,"breaks"] <- "$30-$40K"
+  } else if (df_2010$df[i,"value"]>=40000) {
+    df_2010$df[i,"breaks"] <- "$40K+"
+  } 
+}
+df_2010$df$value<-df_2010$df$breaks
+county_choropleth(df_2010$df)
+
 
 ###### Do this off of percent_change from 2010..
+
+
+data(df_pop_state)
+df_pop_state$str = ""
+for (i in 1:nrow(df_pop_state))
+{
+  if (df_pop_state[i,"value"] < 1000000)
+  {
+    df_pop_state[i,"str"] = "< 1M"
+  } else {
+    df_pop_state[i,"str"] = "> 1M"
+  }
+}
+df_pop_state$value = df_pop_state$str
+state_choropleth(df_pop_state, title = "Which states have less than 1M people?")
+
 
