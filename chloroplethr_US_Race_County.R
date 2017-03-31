@@ -33,18 +33,8 @@ county_choropleth_acs(tableId="B03001")+labs(title="US Population by County (201
 
 # Changing colors, easy but doesn't work for Alaska)
 county_choropleth_acs(tableId="B19301") +
-  scale_fill_brewer(palette=3) 
+  scale_fill_brewer(palette=2) 
 
-# Changing colors, harder and works for all states
-choro1<-CountyChoropleth$new(df_2015$df)
-choro1$title = "2015 Per Capita Income"
-choro1$ggplot_scale = scale_fill_manual(name="Per Capita Income",values=c("blue", "red","orange","green","black","purple","yellow"), drop=FALSE)
-choro1$render()
-
-choro1$ggplot_scale = scale_fill_manual(name="Per Capita Income",values=col.pal, drop=FALSE)
-choro1$render()
-
-###### Animated Choropleth
 df_2015<-get_acs_data(tableId="B19301",map="county",endyear=2015)
 df_2014<-get_acs_data(tableId="B19301",map="county",endyear=2014)
 df_2013<-get_acs_data(tableId="B19301",map="county",endyear=2013)
@@ -52,6 +42,16 @@ df_2012<-get_acs_data(tableId="B19301",map="county",endyear=2012)
 df_2011<-get_acs_data(tableId="B19301",map="county",endyear=2011)
 df_2010<-get_acs_data(tableId="B19301",map="county",endyear=2010)
 
+# Changing colors, harder and works for all states
+choro1<-CountyChoropleth$new(df_2015$df)
+choro1$title = "2015 Per Capita Income"
+choro1$ggplot_scale <- scale_fill_manual(name="Per Capita Income",values=c("blue", "red","orange","green","black","purple","yellow"), drop=FALSE)
+choro1$render()
+
+choro1$ggplot_scale <- scale_fill_manual(name="Per Capita Income",values=col.pal, drop=FALSE)
+choro1$render()
+
+###### Animated Choropleth
 choro_list<-list()
 choro_list[[1]]<-county_choropleth(df_2010$df)
 choro_list[[2]]<-county_choropleth(df_2011$df)
