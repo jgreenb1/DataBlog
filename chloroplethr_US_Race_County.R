@@ -63,6 +63,7 @@ choro_list[[6]]<-county_choropleth(df_2015$df)
 choroplethr_animate(choro_list)
 
 # Number of bins
+county_choropleth_acs(tableId="B19301")
 county_choropleth_acs(tableId="B19301",num_colors=4) 
 county_choropleth_acs(tableId="B19301",num_colors=1)  # continuous
 
